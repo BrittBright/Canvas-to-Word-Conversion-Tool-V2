@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Turn a Canvas course export into separate Word documents. Course content is processed in your browser.">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data:; frame-src 'self' blob:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none';">
+  <title>Canvas to Word</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="vendor/jszip.min.js" defer></script>
+  <script src="vendor/docx.js" defer></script>
+  <script src="converter.js?v=0.1.2" defer></script>
+  <script src="app.js?v=0.1.2" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to converter</a>
+  <header class="topbar">
+    <div class="brand"><svg aria-hidden="true" viewBox="0 0 32 32"><path d="M7 3h12l7 7v19H7zM19 3v8h7M11 16h11M11 21h11"/></svg><span>Canvas to Word</span></div>
+    <span class="version">Prototype 0.1.2</span>
+  </header>
+  <main id="main">
+    <section id="start" class="start" aria-labelledby="start-title">
+      <div class="start-copy">
+        <p class="eyebrow">Course materials, ready to use offline</p>
+        <h1 id="start-title">Turn your course export into Word files.</h1>
+        <p>Choose a Canvas <strong>.imscc</strong> export, select the materials you need, and download editable documents.</p>
+      </div>
+      <div class="upload-panel" id="dropzone">
+        <svg class="upload-icon" viewBox="0 0 48 48" aria-hidden="true"><path d="M10 5h18l10 10v28H10zM28 5v10h10M24 34V21m-6 6 6-6 6 6"/></svg>
+        <label class="primary file-button" for="file">Choose course export<input id="file" type="file" accept=".imscc,.zip" aria-describedby="file-help"></label>
+        <p id="file-help">Or drag your .imscc file here. Up to 250 MB.</p>
+        <p class="privacy">Your course stays in this browser. No Canvas login required.</p>
+      </div>
+      <details class="help"><summary>How do I get a course export?</summary><p>In Canvas, open your course and go to <strong>Settings → Export Course Content</strong>. Choose <strong>Course</strong>, click <strong>Create Export</strong>, then download the new export when it is ready.</p><p>This tool converts saved course materials. Canvas course exports do not contain grades or student submissions. Linked websites, videos, and external activities may still need an internet connection.</p></details>
+    </section>
+    <div id="error" class="message error" role="alert" hidden></div>
+    <div id="loading" class="loading" role="status" hidden><span class="spinner" aria-hidden="true"></span><span>Reading course content…</span></div>
+    <section id="workspace" class="workspace" hidden aria-labelledby="course-title">
+      <div class="coursebar"><div><p class="eyebrow">Course export</p><h1 id="course-title"></h1><p id="course-meta" class="secondary"></p></div><button id="replace" class="secondary-button" type="button">Choose another export</button></div>
+      <div class="work-grid">
+        <section class="catalog" aria-label="Choose course materials">
+          <div class="catalog-tools">
+            <label class="search-wrap" for="search"><span class="sr-only">Search item titles</span><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><input type="search" id="search" placeholder="Search item titles"></label>
+            <label for="type"><span class="sr-only">Filter item type</span><select id="type"><option value="">All types</option></select></label>
+          </div>
+          <div class="selection-tools"><span id="visible-count"></span><div><button id="select-visible" class="text-button" type="button">Select visible</button><button id="clear" class="text-button" type="button">Clear</button></div></div>
+          <div id="outline" class="outline"></div>
+        </section>
+        <section class="preview-panel" aria-labelledby="preview-heading">
+          <div class="preview-bar"><h2 id="preview-heading">Document preview</h2><span id="preview-type" class="type-label" hidden></span></div>
+          <div id="preview-empty" class="preview-empty"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M12 5h16l8 8v30H12zM28 5v8h8M18 22h12M18 28h12M18 34h8"/></svg><h3>Take a look before downloading.</h3><p>Choose an item title to preview its Word content. Checkboxes control which items are exported.</p></div>
+          <div id="preview-loading" class="preview-loading" role="status" hidden>Preparing preview…</div>
+          <iframe id="preview" title="Converted course item preview" sandbox="allow-same-origin" hidden></iframe>
+          <div id="review" class="review" hidden><details id="review-details"><summary id="review-summary"></summary><ul id="review-list"></ul></details></div>
+        </section>
+      </div>
+      <div class="exportbar">
+        <div class="export-settings">
+          <div class="selection-total"><strong id="selected-count">0 items selected</strong><span id="download-hint">Select materials to download.</span></div>
+          <div class="settings-row"><label for="quiz-mode">Quizzes <select id="quiz-mode"><option value="student">Student copy</option><option value="key">Instructor answer key</option></select></label><label class="check-label"><input type="checkbox" id="include-files" checked>Include linked files in ZIP</label></div>
+        </div>
+        <button class="primary" id="export" type="button" disabled>Download Word files</button>
+      </div>
+      <div id="export-progress" class="export-progress" hidden role="status"><span id="progress-text"></span><progress id="progress" max="100" value="0"></progress></div>
+      <div id="result" class="result" hidden role="status"></div>
+    </section>
+    <p class="footer-note">Course material conversion prototype. Review the Word files before distributing them.</p>
+  </main>
+  <div id="live" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+</body>
+</html>
