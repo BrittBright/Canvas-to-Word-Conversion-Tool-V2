@@ -1,16 +1,26 @@
-# Prototype validation
+# Version 1.3.1 validation
 
-Validated against the instructor-authorized Canvas course export supplied for this project. Instructor content is not included in this application package.
+Tested against the instructor-provided QTI 1.2 export: 100 items consisting of 77 multiple choice, 12 multiple answer, one ordering, five numerical, four categorization, and one matching question. All 11 previously unsupported items are recognized without a fallback warning in this sample.
 
-- Parsed 99 supported items: 28 pages, 49 assignments, 1 discussion, 8 announcements, 3 quizzes, 9 external links, and 1 syllabus.
-- Preserved 17 modules and recovered all 20 quiz questions from Canvas's full QTI files, rather than the empty Common Cartridge quiz shells.
-- Generated 99 separate student Word documents and a ZIP with module folders, linked files, and a conversion report. The test produced 52 embedded image placements.
-- Checked the generated Office XML for well-formedness, title preservation, image embedding, student answer-key exclusion, and extracted instructor answers. A multiple-answer question specifically verifies that negated QTI conditions are not treated as correct answers.
-- Checked selection filters, module selection, focus retention, preview sanitization, one-item DOCX download, and full-course ZIP download in an independent DOM environment using the actual application bundles. Invalid exports and unsafe ZIP paths are rejected.
-- Version 0.1.1 adds strict libxml2 parsing checks for all 98 XML/QTI files. The original export reproduces three failures in quiz metadata caused by an invalid `xmlns:xsi` URI. The targeted namespace repair resolves all three without changing quiz directions or question data. This check supplements the more permissive DOM environment that missed the initial browser failure.
-- Version 0.1.2 fixes duplicate built-in Word style definitions. A regression using the production bundles reproduces the previous duplicate IDs and verifies unique style IDs/names, Heading 1–6 names and outline levels, and resolved paragraph/hyperlink references. All 99 course documents pass these additional structural checks. The corrected STEM module overview preserves every document part except the duplicate style definitions; it matches the regenerated source text and heading properties. Its two pages and the six-page student AI quiz were rendered and visually reviewed after the fix.
-- Rendered and visually inspected representative Word outputs: the 22-image Google Drive guide, a syllabus assignment with a rubric table, and student/instructor versions of the AI quiz. Layout review led to fixes for percentage image widths, keeping quiz choices together, and keeping table rows together.
+Checks cover:
 
-The DOM tests use Sharp for image decoding because the test environment lacks a usable local browser. Native browser canvas decoding and the live browser interface still require instructor testing. The private hosted site could not be tested through the cloud browser because it requires sign-in. These checks are not an accessibility certification; review Word's Accessibility Checker and the conversion notes before distribution.
+- Complete ordering sequences and numerical values from the source scoring conditions.
+- Category assignments identified by response ID, including the 1/2/2 clinical task and unused distractors. Repeated option lists are deduplicated for paper output.
+- Matching prompts, shared answer choices, and preserved pairs.
+- Negated conditions excluded from the 12 multiple-answer keys.
+- All 100 question XML trees, including original HTML, keys, feedback, point values, and metadata, retained through an unchanged editable Word-to-QTI round trip. Known malformed Canvas namespace metadata is repaired without changing quiz settings.
+- Edits to the sequence, a numerical range, category assignments, matching pairs, a stem, a category label, quiz title, and question order.
+- Functional import/preview and Word validation using JSDOM with the shipped application files.
+- Student and instructor clean copies exclude the custom source archive; student copies exclude answer-key labels and converter markers.
+- Every generated DOCX XML part and the rebuilt QTI XML pass strict lxml parsing.
+- Synthetic fresh questions cover all four new types, inclusive/exclusive ranges, alternative numerical answers, extra distractors, invalid order keys/ranges/assignments, and legacy template compatibility.
 
-Suggested instructor test: export one screenshot-heavy page, one assignment, one discussion, and one quiz; compare each Word file with Canvas, then try a module ZIP. Check question wording, answer choices, image readability/alt text, heading navigation, tables, and the conversion report.
+Seven representative questions spanning all four types and all category layouts were rendered to PDF/PNG for both student and key output. Every sample page was visually inspected, including paragraph breaks, answer-space placement, scientific notation, sequence numbering, and category/matching layouts.
+
+No instructor content or generated exams are included in the application package. A native browser runtime was unavailable for local UI rendering; functional UI checks used JSDOM. Live browser behavior, Microsoft Word saving of editable source parts, and Canvas import/Build/Student Preview still require instructor testing. LibreOffice render checks do not establish Microsoft Word or Canvas behavior.
+
+## Expanded template download
+
+The real Download Word template handler generates 11 complete examples covering all 10 supported types. Tests verify every example's answer fields and points, both numerical variants, matching/category distractors, and exclusion of how-to notes from question text. The template contains no imported source data, even when an instructor quiz is already loaded.
+
+All examples pass DOCX to QTI to editable DOCX to QTI checks with their question XML retained. This also checks that essay and short-answer response placeholders are not treated as choices. The standalone template's Office XML passes strict parsing. All six rendered pages were visually inspected; complete example blocks stay on the same page. The package includes that reviewed DOCX.

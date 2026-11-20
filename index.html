@@ -3,69 +3,123 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Turn a Canvas course export into separate Word documents. Course content is processed in your browser.">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data:; frame-src 'self' blob:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none';">
-  <title>Canvas to Word</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="vendor/jszip.min.js" defer></script>
-  <script src="vendor/docx.js" defer></script>
-  <script src="converter.js?v=0.1.2" defer></script>
-  <script src="app.js?v=0.1.2" defer></script>
+  <title>QTI Word Studio</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="export-options.css">
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to converter</a>
-  <header class="topbar">
-    <div class="brand"><svg aria-hidden="true" viewBox="0 0 32 32"><path d="M7 3h12l7 7v19H7zM19 3v8h7M11 16h11M11 21h11"/></svg><span>Canvas to Word</span></div>
-    <span class="version">Prototype 0.1.2</span>
-  </header>
-  <main id="main">
-    <section id="start" class="start" aria-labelledby="start-title">
-      <div class="start-copy">
-        <p class="eyebrow">Course materials, ready to use offline</p>
-        <h1 id="start-title">Turn your course export into Word files.</h1>
-        <p>Choose a Canvas <strong>.imscc</strong> export, select the materials you need, and download editable documents.</p>
-      </div>
-      <div class="upload-panel" id="dropzone">
-        <svg class="upload-icon" viewBox="0 0 48 48" aria-hidden="true"><path d="M10 5h18l10 10v28H10zM28 5v10h10M24 34V21m-6 6 6-6 6 6"/></svg>
-        <label class="primary file-button" for="file">Choose course export<input id="file" type="file" accept=".imscc,.zip" aria-describedby="file-help"></label>
-        <p id="file-help">Or drag your .imscc file here. Up to 250 MB.</p>
-        <p class="privacy">Your course stays in this browser. No Canvas login required.</p>
-      </div>
-      <details class="help"><summary>How do I get a course export?</summary><p>In Canvas, open your course and go to <strong>Settings → Export Course Content</strong>. Choose <strong>Course</strong>, click <strong>Create Export</strong>, then download the new export when it is ready.</p><p>This tool converts saved course materials. Canvas course exports do not contain grades or student submissions. Linked websites, videos, and external activities may still need an internet connection.</p></details>
-    </section>
-    <div id="error" class="message error" role="alert" hidden></div>
-    <div id="loading" class="loading" role="status" hidden><span class="spinner" aria-hidden="true"></span><span>Reading course content…</span></div>
-    <section id="workspace" class="workspace" hidden aria-labelledby="course-title">
-      <div class="coursebar"><div><p class="eyebrow">Course export</p><h1 id="course-title"></h1><p id="course-meta" class="secondary"></p></div><button id="replace" class="secondary-button" type="button">Choose another export</button></div>
-      <div class="work-grid">
-        <section class="catalog" aria-label="Choose course materials">
-          <div class="catalog-tools">
-            <label class="search-wrap" for="search"><span class="sr-only">Search item titles</span><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><input type="search" id="search" placeholder="Search item titles"></label>
-            <label for="type"><span class="sr-only">Filter item type</span><select id="type"><option value="">All types</option></select></label>
-          </div>
-          <div class="selection-tools"><span id="visible-count"></span><div><button id="select-visible" class="text-button" type="button">Select visible</button><button id="clear" class="text-button" type="button">Clear</button></div></div>
-          <div id="outline" class="outline"></div>
-        </section>
-        <section class="preview-panel" aria-labelledby="preview-heading">
-          <div class="preview-bar"><h2 id="preview-heading">Document preview</h2><span id="preview-type" class="type-label" hidden></span></div>
-          <div id="preview-empty" class="preview-empty"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M12 5h16l8 8v30H12zM28 5v8h8M18 22h12M18 28h12M18 34h8"/></svg><h3>Take a look before downloading.</h3><p>Choose an item title to preview its Word content. Checkboxes control which items are exported.</p></div>
-          <div id="preview-loading" class="preview-loading" role="status" hidden>Preparing preview…</div>
-          <iframe id="preview" title="Converted course item preview" sandbox="allow-same-origin" hidden></iframe>
-          <div id="review" class="review" hidden><details id="review-details"><summary id="review-summary"></summary><ul id="review-list"></ul></details></div>
-        </section>
-      </div>
-      <div class="exportbar">
-        <div class="export-settings">
-          <div class="selection-total"><strong id="selected-count">0 items selected</strong><span id="download-hint">Select materials to download.</span></div>
-          <div class="settings-row"><label for="quiz-mode">Quizzes <select id="quiz-mode"><option value="student">Student copy</option><option value="key">Instructor answer key</option></select></label><label class="check-label"><input type="checkbox" id="include-files" checked>Include linked files in ZIP</label></div>
+  <header class="hero">
+    <div class="wrap">
+      <div class="brand-lockup">
+        <img src="assets/brightpoint-logo.png" alt="Brightpoint Community College">
+        <div>
+          <p class="eyebrow">Center for Teaching and Learning · Faculty tool · Version 1.3.1</p>
+          <h1>QTI <span aria-hidden="true">⇄</span><span class="sr-only">to and from</span> Word Studio</h1>
+          <p class="lede">Convert Canvas QTI packages into editable Word documents—and turn a structured Word document back into a Canvas-ready QTI package.</p>
+          <div class="privacy-note"><strong>Your files stay on this device.</strong> Conversion happens in your browser. Nothing is uploaded or stored.</div>
         </div>
-        <button class="primary" id="export" type="button" disabled>Download Word files</button>
       </div>
-      <div id="export-progress" class="export-progress" hidden role="status"><span id="progress-text"></span><progress id="progress" max="100" value="0"></progress></div>
-      <div id="result" class="result" hidden role="status"></div>
+    </div>
+  </header>
+
+  <main id="main" class="wrap">
+    <section class="mode-switch" aria-label="Choose a conversion direction">
+      <button class="mode active" id="mode-qti" type="button" aria-pressed="true">QTI to Word</button>
+      <button class="mode" id="mode-word" type="button" aria-pressed="false">Word to QTI</button>
     </section>
-    <p class="footer-note">Course material conversion prototype. Review the Word files before distributing them.</p>
+
+    <section class="panel" id="qti-panel" aria-labelledby="qti-heading">
+      <div class="panel-heading">
+        <div><p class="step">Direction 1</p><h2 id="qti-heading">Convert a QTI package to Word</h2></div>
+        <span class="badge">.zip → .docx</span>
+      </div>
+      <div class="directions" aria-labelledby="qti-directions-heading">
+        <h3 id="qti-directions-heading">Before you begin</h3>
+        <ol>
+          <li>Export the quiz from Canvas as a QTI ZIP package. Do not unzip it.</li>
+          <li>Upload the ZIP below and review the question preview and any warnings.</li>
+          <li>Choose a blank exam, an answer key, or an editable re-upload document.</li>
+        </ol>
+        <p><strong>Supported:</strong> Multiple choice, multiple answer, True/False, essay, short answer, directions, ordering, numerical, categorization, and matching. Question-bank references, randomized groups, embedded media, complex mathematics, and incomplete keys require review.</p>
+      </div>
+      <label class="drop-zone" id="qti-drop" for="qti-file">
+        <span class="drop-title">Choose or drop a Canvas QTI ZIP</span>
+        <span class="drop-help">The converter will inspect the package before creating the Word document.</span>
+        <input id="qti-file" type="file" accept=".zip,application/zip">
+      </label>
+      <div id="qti-status" class="status" role="status" aria-live="polite"></div>
+      <div id="qti-results" hidden>
+        <div class="summary" id="qti-summary"></div>
+        <div class="export-options" aria-labelledby="export-heading">
+          <h3 id="export-heading">Choose a Word file</h3>
+          <div class="export-grid">
+            <div class="export-card"><h4>Blank exam</h4><p>Clean student copy with numbered questions and no answers or converter markers.</p><button id="download-blank" class="primary" type="button">Download blank exam</button></div>
+            <div class="export-card"><h4>Answer key</h4><p>Clean instructor copy with correct responses clearly marked and no converter markers.</p><button id="download-key" class="primary" type="button">Download answer key</button></div>
+            <div class="export-card"><h4>Edit and re-upload</h4><p>Instructor copy with answer fields and original quiz data. Keep its markers and Source IDs intact.</p><button id="download-editable" class="primary" type="button">Download editable file</button></div>
+          </div>
+        </div>
+        <div class="actions">
+          <button id="reset-qti" class="secondary" type="button">Start over</button>
+        </div>
+        <div id="qti-warnings" class="warnings" hidden></div>
+        <h3>Question preview</h3>
+        <div id="qti-preview" class="preview"></div>
+      </div>
+    </section>
+
+    <section class="panel" id="word-panel" aria-labelledby="word-heading" hidden>
+      <div class="panel-heading">
+        <div><p class="step">Direction 2</p><h2 id="word-heading">Convert a structured Word document to QTI</h2></div>
+        <span class="badge">.docx → .zip</span>
+      </div>
+      <div class="directions" aria-labelledby="word-directions-heading">
+        <h3 id="word-directions-heading">Before you begin</h3>
+        <ol>
+          <li>Download and use the provided Word template. Keep the bracketed <code>[[QUESTION]]</code> markers and field labels intact.</li>
+          <li>Mark correct choices with an asterisk, such as <code>*b. Mitochondrion</code>.</li>
+          <li>Upload the completed DOCX and correct every validation error before downloading the QTI package.</li>
+          <li>Import the ZIP into an unpublished Canvas sandbox quiz and verify every question in Build and Student Preview before publishing.</li>
+        </ol>
+        <p><strong>Editing imported quizzes:</strong> Edit the downloaded DOCX directly and keep its Source IDs. Keep the number of choices and prompts/categories for imported questions to preserve scoring. Ordering uses <code>Correct order: b, a, c</code>; numerical uses <code>Exact: 2</code> or <code>Range: 1.9 | 2.1</code>; matching and categorization use numbered prompts/categories and assignments such as <code>1 = a, c</code>.</p>
+        <p><strong>Limitations:</strong> Arbitrary Word documents are not interpreted. Original quiz resources and settings are retained when the editable file contains its original quiz data. New media, complex equations, question banks, and randomized groups require review in Canvas. Advanced types require a compatible Canvas quiz importer; verify them in a sandbox.</p>
+      </div>
+      <div class="template-box">
+        <div><h3>Start with the template</h3><p>Worked examples of all 10 supported types, including exact and range-based numerical answers, with instructions for each.</p></div>
+        <button id="download-template" class="secondary" type="button">Download Word template</button>
+      </div>
+      <label class="drop-zone" id="word-drop" for="word-file">
+        <span class="drop-title">Choose or drop a completed Word template</span>
+        <span class="drop-help">Only .docx files are supported. A validation report appears before download.</span>
+        <input id="word-file" type="file" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+      </label>
+      <div id="word-status" class="status" role="status" aria-live="polite"></div>
+      <div id="word-results" hidden>
+        <div class="summary" id="word-summary"></div>
+        <label for="quiz-title">Quiz title</label>
+        <input id="quiz-title" class="text-input" type="text" value="Imported Quiz">
+        <div id="word-errors" class="errors" hidden></div>
+        <div class="actions">
+          <button id="download-qti" class="primary" type="button">Download Canvas QTI package</button>
+          <button id="reset-word" class="secondary" type="button">Start over</button>
+        </div>
+        <h3>Question preview</h3>
+        <div id="word-preview" class="preview"></div>
+      </div>
+    </section>
+
+    <section class="support panel" aria-labelledby="supported-heading">
+      <h2 id="supported-heading">Conversion safeguards and limitations</h2>
+      <p>This tool reduces repetitive quiz entry; it does not replace instructor review. A successful download or Canvas import does not prove that every question was interpreted correctly.</p>
+      <div class="support-grid">
+        <div><h3>Supported</h3><ul><li>Multiple choice and multiple answer</li><li>True/False, essay, and short answer</li><li>Ordering and numerical answers</li><li>Categorization and matching</li><li>Text-only directions</li><li>Points and general feedback</li></ul></div>
+        <div><h3>Flagged for review</h3><ul><li>Question groups and bank references</li><li>Unsupported Canvas question types</li><li>Missing answer keys</li><li>Malformed template markers</li><li>Embedded media and complex mathematics</li></ul></div>
+      </div>
+    </section>
   </main>
-  <div id="live" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+  <footer><div class="wrap"><strong>Brightpoint Community College</strong> · QTI Word Studio 1.3.1 · Files are processed locally in your browser.</div></footer>
+  <script src="vendor/jszip.min.js"></script>
+  <script src="question-types.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
